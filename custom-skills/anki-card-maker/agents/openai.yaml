@@ -1,0 +1,4 @@
+interface:
+  display_name: "Anki Card Maker"
+  short_description: "生成、审核、发布和优化 Anki 记忆卡片"
+  default_prompt: "使用 $anki-card-maker 从材料中生成值得长期记忆、能用于实际问题的卡片，或优化现有 Anki 卡片；默认只展示草稿或修改建议，不写入 Anki。"

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Error: poetry is disabled; use uv instead:" >&2
+echo "" >&2
+echo "  Initialize a project: uv init" >&2
+echo "  Add a dependency: uv add PACKAGE" >&2
+echo "  Sync dependencies: uv sync" >&2
+echo "  Run a command: uv run COMMAND" >&2
+echo "" >&2
+exit 1

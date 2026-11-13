@@ -1,0 +1,3 @@
+interface:
+  display_name: "discovery"
+  short_description: "找出真正需要决定的问题，并统一项目中容易混淆的术语"

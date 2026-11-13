@@ -1,0 +1,3 @@
+interface:
+  display_name: "implementation"
+  short_description: "完成一项范围清楚的代码或配置改动，并确认实际结果有效"

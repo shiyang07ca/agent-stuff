@@ -1,0 +1,3 @@
+interface:
+  display_name: "project-init"
+  short_description: "创建或整理项目 Agent 说明，并迁移旧版本地任务目录"

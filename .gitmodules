@@ -1,0 +1,9 @@
+[submodule "vendors/baoyu-skills"]
+	path = vendors/baoyu-skills
+	url = https://github.com/jimliu/baoyu-skills.git
+[submodule "vendors/agent-reach"]
+	path = vendors/agent-reach
+	url = https://github.com/Panniantong/Agent-Reach.git
+[submodule "vendors/obsidian-skills"]
+	path = vendors/obsidian-skills
+	url = https://github.com/kepano/obsidian-skills.git

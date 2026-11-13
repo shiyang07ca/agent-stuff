@@ -1,0 +1,5 @@
+interface:
+  display_name: "architecture"
+  short_description: "找出当前结构为什么难改，并比较可以实际落地的修改方案"
+policy:
+  allow_implicit_invocation: false

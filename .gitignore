@@ -1,0 +1,8 @@
+.vscode/
+.DS_Store
+__pycache__/
+.runtime/
+.scratch/
+.pi/
+node_modules/
+custom-skills/web-browser/scripts/node_modules/

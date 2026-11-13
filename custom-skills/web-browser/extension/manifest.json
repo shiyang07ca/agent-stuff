@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Agent Web Browser",
+  "version": "1.0.0",
+  "description": "供本机 Agent 使用的浏览器连接，保留已有登录与标签页。",
+  "minimum_chrome_version": "125",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7HuPH14sU6f/+svTLNjVgZ5Dig0QhsmYVPW7oCmGvIocor191d4y7pEflXsiGIARPbjO0aFOgELtx3z+U2T9ZOIXohAmtRiD3dsL9U0ViYyKiNmDOcYML3cirbzjIyvwgrckk7uX1d7BDvGv7g03EIdh9tTcoGNBLhE0K0F46BwxhPqJnIXiReJLSgdK2iDJ79fmEzxcezfdbJR8Zx0zUSBSri4bPkcRw3AT6yrijmstpNt0v7bVjAhm0sLQztqfYxTPZ6w+Y9lRfX8hPprNbPMCd4mZUKBN1OilZ7YrjhDAacnOSYdIYQgnoRR0RyE83agxpHplFVMjKB6hvpf+nwIDAQAB",
+  "permissions": ["debugger", "nativeMessaging", "tabs", "storage", "alarms"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "Agent Web Browser", "default_popup": "popup.html" }
+}

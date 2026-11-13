@@ -1,0 +1,5 @@
+interface:
+  display_name: "simplify"
+  short_description: "审查并用可验证的消融实验删除指定改动中的无用复杂度"
+policy:
+  allow_implicit_invocation: false

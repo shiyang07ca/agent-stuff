@@ -1,0 +1,5 @@
+interface:
+  display_name: "prototype"
+  short_description: "用一个隔离、能运行的小原型回答明确的技术或交互问题"
+policy:
+  allow_implicit_invocation: false

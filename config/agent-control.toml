@@ -1,0 +1,220 @@
+[governance]
+implicit_budget = 25
+
+[[governance.trigger_groups]]
+name = "visual-content"
+limit = 1
+skills = [
+    "baoyu-diagram",
+    "baoyu-image-gen",
+    "baoyu-infographic",
+    "baoyu-xhs-images",
+    "baoyu-cover-image",
+    "baoyu-comic",
+    "baoyu-article-illustrator",
+    "baoyu-slide-deck",
+]
+
+[[governance.trigger_groups]]
+name = "markdown-content"
+limit = 2
+skills = [
+    "baoyu-format-markdown",
+    "baoyu-markdown-to-html",
+    "baoyu-url-to-markdown",
+    "obsidian-markdown",
+]
+
+[[skills]]
+source = "custom-skills/teach"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/telegram-knowledge"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/audio-transcription"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/commit"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/ghidra"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/github"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/librarian"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/sentry"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/tmux"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/uv"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/web-browser"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/anki-card-maker"
+invocation = "explicit"
+
+[[skills]]
+# 使用上游原始中文 SKILL.md；SKILL_en.md 仅作为 Vendor 附带参考。
+source = "vendors/agent-reach/agent_reach/skill"
+expected_name = "agent-reach"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/obsidian-skills/skills/obsidian-markdown"
+invocation = "implicit"
+
+[[skills]]
+source = "vendors/obsidian-skills/skills/obsidian-cli"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/project-init"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/discovery"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/spec"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/task-breakdown"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/implementation"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/tdd"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/debugging"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/review"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/simplify"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/architecture"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/research"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/prototype"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/conflicts"
+invocation = "explicit"
+
+[[skills]]
+source = "custom-skills/engineering/triage"
+invocation = "implicit"
+
+[[skills]]
+source = "custom-skills/engineering/handoff"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-article-illustrator"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-comic"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-compress-image"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-cover-image"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-danger-gemini-web"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-danger-x-to-markdown"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-diagram"
+invocation = "implicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-electron-extract"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-format-markdown"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-image-gen"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-infographic"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-markdown-to-html"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-slide-deck"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-translate"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-url-to-markdown"
+invocation = "implicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-wechat-summary"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-xhs-images"
+invocation = "explicit"
+
+[[skills]]
+source = "vendors/baoyu-skills/skills/baoyu-youtube-transcript"
+invocation = "explicit"

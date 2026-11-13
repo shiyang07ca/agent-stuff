@@ -1,0 +1,3 @@
+interface:
+  display_name: "research"
+  short_description: "查找一手资料，回答工程问题并给出可以复核的结论和依据"

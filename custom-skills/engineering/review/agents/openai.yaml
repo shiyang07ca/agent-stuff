@@ -1,0 +1,5 @@
+interface:
+  display_name: "review"
+  short_description: "审查指定改动，指出会影响正确性、安全性或后续维护的问题"
+policy:
+  allow_implicit_invocation: false

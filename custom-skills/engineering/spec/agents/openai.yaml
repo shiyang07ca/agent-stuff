@@ -1,0 +1,5 @@
+interface:
+  display_name: "spec"
+  short_description: "把需求写成范围清楚、可以直接实现并检查结果的中文规格"
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,3 @@
+interface:
+  display_name: "debugging"
+  short_description: "稳定重现报错或性能问题，找到原因并确认修复确实有效"

@@ -1,0 +1,51 @@
+{
+  "name": "monte-pi",
+  "version": "1.6.0",
+  "private": true,
+  "scripts": {
+    "check": "node scripts/resources-smoke.mjs && node scripts/background-smoke.mjs"
+  },
+  "description": "个人日常使用的 Pi Coding Agent 命令、技能、扩展与主题工具箱",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiyang07ca/agent-stuff.git",
+    "directory": "pi"
+  },
+  "readme": "README.md",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi-skill",
+    "pi-theme"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions/*.ts"
+    ],
+    "skills": [
+      "./skills"
+    ],
+    "themes": [
+      "./themes"
+    ],
+    "prompts": [
+      "./commands"
+    ]
+  },
+  "dependencies": {
+    "diff": "^8.0.2"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "1.4.0",
+    "@earendil-works/pi-ai": "1.4.0",
+    "@earendil-works/pi-tui": "1.4.0",
+    "typebox": "1.3.27"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*"
+  }
+}

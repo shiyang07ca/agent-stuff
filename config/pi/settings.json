@@ -1,0 +1,30 @@
+{
+  "webSearch": {
+    "model": "sub2api/gpt-6.1-sol"
+  },
+  "theme": "dayowl",
+  "defaultProvider": "sub2api",
+  "defaultModel": "gpt-6.1-sol",
+  "enabledModels": [
+    "4router/claude-opus-5-5",
+    "sub2api/gpt-6-luna",
+    "sub2api/gpt-6-astra",
+    "sub2api/gpt-6.1-sol",
+    "deepseek/deepseek-flash"
+  ],
+  "tuiMode": "fullscreen",
+  "showHardwareCursor": true,
+  "enableInstallTelemetry": false,
+  "hideThinkingBlock": false,
+  "compaction": {
+    "enabled": true,
+    "modelOverrides": {
+      "4router/claude-opus-5-5": {
+        "reserveTokens": 64000,
+        "keepRecentTokens": 48000
+      }
+    }
+  },
+  "defaultThinkingLevel": "medium",
+  "defaultProjectTrust": "ask"
+}

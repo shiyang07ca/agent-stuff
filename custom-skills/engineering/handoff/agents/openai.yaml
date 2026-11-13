@@ -1,0 +1,5 @@
+interface:
+  display_name: "handoff"
+  short_description: "写清当前进度、检查结果和下一步，让后续会话可以直接继续"
+policy:
+  allow_implicit_invocation: false

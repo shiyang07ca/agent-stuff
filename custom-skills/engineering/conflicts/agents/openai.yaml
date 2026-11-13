@@ -1,0 +1,5 @@
+interface:
+  display_name: "conflicts"
+  short_description: "看懂 Git 冲突两边原本要改什么，并保留正确结果"
+policy:
+  allow_implicit_invocation: false

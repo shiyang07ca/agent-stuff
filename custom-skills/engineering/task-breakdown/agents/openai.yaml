@@ -1,0 +1,5 @@
+interface:
+  display_name: "task-breakdown"
+  short_description: "把规格拆成有先后关系、可以分别完成和检查的本地任务"
+policy:
+  allow_implicit_invocation: false

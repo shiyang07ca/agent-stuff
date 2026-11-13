@@ -1,0 +1,100 @@
+{
+  "providers": {
+    "4router": {
+      "baseUrl": "https://4router.ai",
+      "api": "anthropic-messages",
+      "models": [
+        {
+          "id": "claude-opus-5-5",
+          "name": "Claude Opus 5 - 4Router",
+          "reasoning": true,
+          "compat": {
+            "forceAdaptiveThinking": true
+          },
+          "input": ["text", "image"],
+          "contextWindow": 380000,
+          "maxTokens": 32000,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": null,
+            "medium": null,
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": null
+          }
+        }
+      ]
+    },
+    "sub2api": {
+      "name": "Sub2API (ChatGPT)",
+      "baseUrl": "http://127.0.0.1:8080/v1",
+      "api": "openai-responses",
+      "models": [
+        {
+          "id": "gpt-6-luna",
+          "name": "GPT-6 Luna (Sub2API)",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": null,
+            "minimal": null,
+            "low": null,
+            "medium": null,
+            "high": null,
+            "xhigh": null,
+            "max": "max"
+          },
+          "input": ["text", "image"],
+          "contextWindow": 272000,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        },
+        {
+          "id": "gpt-6-astra",
+          "name": "GPT-6 Astra (Sub2API)",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": "low",
+            "medium": null,
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": null
+          },
+          "input": ["text", "image"],
+          "contextWindow": 272000,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        },
+        {
+          "id": "gpt-6.1-sol",
+          "name": "GPT-6.1 Sol (Sub2API)",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": null,
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "xhigh"
+          },
+          "input": ["text", "image"],
+          "contextWindow": 272000,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        }
+      ]
+    }
+  }
+}

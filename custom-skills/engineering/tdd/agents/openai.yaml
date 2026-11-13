@@ -1,0 +1,3 @@
+interface:
+  display_name: "tdd"
+  short_description: "先用失败测试证明缺少目标行为，再实现并整理最少代码"

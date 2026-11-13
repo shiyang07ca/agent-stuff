@@ -1,0 +1,3 @@
+interface:
+  display_name: "triage"
+  short_description: "判断任务信息是否完整、被什么阻塞以及下一步怎么处理"

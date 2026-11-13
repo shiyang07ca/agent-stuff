@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "currentMode": "default",
+  "modes": {
+    "default": {
+      "provider": "sub2api",
+      "modelId": "gpt-6.1-sol",
+      "thinkingLevel": "medium"
+    },
+    "fast": {
+      "provider": "sub2api",
+      "modelId": "gpt-6-luna",
+      "thinkingLevel": "max"
+    },
+    "dev": {
+      "provider": "sub2api",
+      "modelId": "gpt-6.1-sol",
+      "thinkingLevel": "xhigh"
+    }
+  }
+}

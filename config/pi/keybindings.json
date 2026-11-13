@@ -1,0 +1,19 @@
+{
+  "tui.altScreen.pageDown": [
+    "pageDown",
+    "ctrl+v"
+  ],
+  "tui.altScreen.pageUp": [
+    "pageUp",
+    "alt+v"
+  ],
+  "tui.select.pageDown": [
+    "pageDown",
+    "ctrl+v"
+  ],
+  "tui.select.pageUp": [
+    "pageUp",
+    "alt+v"
+  ],
+  "app.clipboard.pasteImage": "ctrl+alt+v"
+}
