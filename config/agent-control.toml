@@ -30,6 +30,10 @@ source = "custom-skills/teach"
 invocation = "implicit"
 
 [[skills]]
+source = "custom-skills/socratic-tutor"
+invocation = "explicit"
+
+[[skills]]
 source = "custom-skills/telegram-knowledge"
 invocation = "implicit"
 
