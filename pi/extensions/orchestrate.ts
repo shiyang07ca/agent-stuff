@@ -23,7 +23,7 @@ const IMPLEMENTERS = {
 	// },
 	sol: {
 		provider: "sub2api",
-		model: "gpt-6.1-sol",
+		model: "gpt-6.2-sol",
 		thinking: "xhigh" as ThinkingLevel,
 	},
 	luna: {
@@ -49,7 +49,7 @@ const CONFIG = {
 	defaultImplementationProfile: "sol" satisfies ProfileName,
 	planner: {
 		provider: "sub2api",
-		model: "gpt-6-astra",
+		model: "gpt-6.2-astra",
 		thinking: "high" as ThinkingLevel,
 		// provider: "4router",
 		// model: "claude-opus-5-5",
@@ -58,13 +58,13 @@ const CONFIG = {
 	// 独立终审和决策咨询；默认与 planner 相同，可改为其他模型家族。
 	reviewer: {
 		provider: "sub2api",
-		model: "gpt-6-astra",
+		model: "gpt-6.2-astra",
 		thinking: "high" as ThinkingLevel,
 	},
 	implementers: IMPLEMENTERS,
 	plannerModels: [
 		{ provider: "4router", model: "claude-opus-5-5" },
-		{ provider: "sub2api", model: "gpt-6-astra" },
+		{ provider: "sub2api", model: "gpt-6.2-astra" },
 	],
 	tools: ["read", "grep", "find", "ls", "inspect_worktree", "bash", "edit", "write"],
 	maxTaskChars: 64_000,

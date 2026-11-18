@@ -53,7 +53,7 @@
           }
         },
         {
-          "id": "gpt-6-astra",
+          "id": "gpt-6.2-astra",
           "name": "GPT-6 Astra (Sub2API)",
           "reasoning": true,
           "thinkingLevelMap": {
@@ -74,8 +74,8 @@
           }
         },
         {
-          "id": "gpt-6.1-sol",
-          "name": "GPT-6.1 Sol (Sub2API)",
+          "id": "gpt-6.2-sol",
+          "name": "GPT-6 Sol (Sub2API)",
           "reasoning": true,
           "thinkingLevelMap": {
             "off": null,

@@ -1,15 +1,15 @@
 {
   "webSearch": {
-    "model": "sub2api/gpt-6.1-sol"
+    "model": "sub2api/gpt-6.2-sol"
   },
   "theme": "dayowl",
   "defaultProvider": "sub2api",
-  "defaultModel": "gpt-6.1-sol",
+  "defaultModel": "gpt-6.2-sol",
   "enabledModels": [
     "4router/claude-opus-5-5",
     "sub2api/gpt-6-luna",
-    "sub2api/gpt-6-astra",
-    "sub2api/gpt-6.1-sol",
+    "sub2api/gpt-6.2-astra",
+    "sub2api/gpt-6.2-sol",
     "deepseek/deepseek-flash"
   ],
   "tuiMode": "fullscreen",

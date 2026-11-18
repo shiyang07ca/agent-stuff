@@ -4,7 +4,7 @@
   "modes": {
     "default": {
       "provider": "sub2api",
-      "modelId": "gpt-6.1-sol",
+      "modelId": "gpt-6.2-sol",
       "thinkingLevel": "medium"
     },
     "fast": {
@@ -14,7 +14,7 @@
     },
     "dev": {
       "provider": "sub2api",
-      "modelId": "gpt-6.1-sol",
+      "modelId": "gpt-6.2-sol",
       "thinkingLevel": "xhigh"
     }
   }
