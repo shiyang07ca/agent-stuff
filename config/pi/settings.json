@@ -2,6 +2,10 @@
   "webSearch": {
     "model": "sub2api/gpt-6.2-sol"
   },
+  "codemode": {
+    "mode": "on"
+  },
+  "defaultTools": ["+codemode"],
   "theme": "dayowl",
   "defaultProvider": "sub2api",
   "defaultModel": "gpt-6.2-sol",
