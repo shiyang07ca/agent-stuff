@@ -17,6 +17,12 @@ PI_FILES = ("settings.json", "models.json", "keybindings.json", "modes.json")
 BUILTIN_MODELS = {"deepseek/deepseek-flash"}
 LOCAL_SETTINGS = {"lastChangelogVersion", "extensionChangelogVersions"}
 THINKING_LEVELS = {"off", "minimal", "low", "medium", "high", "xhigh", "max"}
+_PINNED_NPM_PACKAGE = re.compile(
+    r"^npm:(?P<name>(?:@[a-z0-9~][a-z0-9-._~]*/)?[a-z0-9~][a-z0-9-._~]*)@"
+    r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)"
+    r"(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
+    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
+)
 _SENSITIVE = {"apikey", "headers", "authorization", "password", "secret", "token",
               "accesstoken", "refreshtoken", "credential", "credentials", "clientsecret"}
 
@@ -204,8 +210,21 @@ def _validate_references(config: dict[str, dict]) -> None:
             raise ValueError("Pi model reference is not defined in models.json or the builtin allowlist")
 
     settings = config["settings.json"]
-    if LOCAL_SETTINGS.intersection(settings) or "packages" in settings:
-        raise ValueError("Local settings fields and packages must be generated, not shared")
+    if LOCAL_SETTINGS.intersection(settings):
+        raise ValueError("Local settings fields must be generated, not shared")
+    if "packages" in settings:
+        packages = settings["packages"]
+        if not isinstance(packages, list):
+            raise ValueError("Shared Pi packages must be an array of exact-version npm:<package>@<version> strings")
+        seen_packages: set[str] = set()
+        for package in packages:
+            match = _PINNED_NPM_PACKAGE.fullmatch(package) if isinstance(package, str) else None
+            if match is None or len(match.group("name")) > 214:
+                raise ValueError("Shared Pi packages must be exact-version npm:<package>@<version> strings")
+            package_name = match.group("name")
+            if package_name in seen_packages:
+                raise ValueError("Duplicate shared Pi package")
+            seen_packages.add(package_name)
     reference(f"{settings.get('defaultProvider')}/{settings.get('defaultModel')}")
     scoped = settings.get("enabledModels", [])
     if not isinstance(scoped, list):
@@ -251,7 +270,7 @@ def generated_config(name: str, source: dict, existing: dict, repo: Path) -> dic
                 elif not isinstance(existing[key], str):
                     raise ValueError("Local settings runtime fields must be strings (content omitted)")
                 result[key] = existing[key]
-        result["packages"] = [str(repo / "pi")]
+        result["packages"] = [str(repo / "pi"), *source.get("packages", ())]
     if name == "modes.json":
         current = existing.get("currentMode", "default")
         result["currentMode"] = current if isinstance(current, str) and current in result["modes"] else "default"

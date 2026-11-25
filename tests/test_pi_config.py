@@ -120,6 +120,60 @@ class PiConfigTests(unittest.TestCase):
         self.assertNotIn('webSearch', result)
         self.assertNotIn('extra', result)
 
+    def test_shared_npm_packages_follow_local_package_and_reject_invalid_specs(self):
+        path = self.source / 'settings.json'
+        baseline = json.loads(path.read_text())
+        shared_packages = [
+            'npm:@estebanforge/pi-antigravity-bridge@1.15.0',
+            'npm:example-pi-tool@0.2.1-beta.1+build.7',
+        ]
+        self.write(path, {**baseline, 'packages': shared_packages})
+        plan = self.plan()
+        self.assertFalse(plan.has_errors, plan.findings)
+        self.apply(plan)
+        written = json.loads((self.agent / 'settings.json').read_text())
+        self.assertEqual(written['packages'], [str(self.repo / 'pi'), *shared_packages])
+        self.assertTrue(self.plan().is_no_op)
+
+        written['packages'] = [str(self.repo / 'pi'), 'npm:@estebanforge/pi-antigravity-bridge']
+        self.write(self.agent / 'settings.json', written)
+        drift_plan = self.plan()
+        self.assertFalse(drift_plan.is_no_op)
+        self.apply(drift_plan)
+        self.assertEqual(
+            json.loads((self.agent / 'settings.json').read_text())['packages'],
+            [str(self.repo / 'pi'), *shared_packages],
+        )
+
+        invalid_packages = [
+            'npm:example-pi-tool@1.0.0',
+            [123],
+            [{'source': 'npm:example-pi-tool@1.0.0'}],
+            [str(self.repo / 'pi')],
+            ['./pi'],
+            ['../pi'],
+            ['~/pi'],
+            ['npm:@estebanforge/pi-antigravity-bridge'],
+            ['npm:example-pi-tool@^1.0.0'],
+            ['npm:example-pi-tool@latest'],
+            ['npm:--global@1.0.0'],
+            ['npm:https://SECRET@example.test/pkg.tgz@1.0.0'],
+            ['npm:example-pi-tool@1.0.0 '],
+            ['npm:@scope/pkg@1.0.0', 'npm:@scope/pkg@1.0.1'],
+        ]
+        before = self.fixture.observable_tree(self.home)
+        for index, packages in enumerate(invalid_packages):
+            with self.subTest(case=index):
+                self.write(path, {**baseline, 'packages': packages})
+                result = self.fixture.run('validate')
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn('PI_CONFIG_INVALID', result.stdout)
+                self.assertNotIn('SECRET', result.stdout + result.stderr)
+                self.assertEqual(before, self.fixture.observable_tree(self.home))
+        self.write(path, {**baseline, 'lastChangelogVersion': '1.6.0', 'packages': shared_packages})
+        self.assertEqual(self.fixture.run('validate').returncode, 1)
+        self.write(path, baseline)
+
     def test_source_and_local_changes_expire_plan(self):
         for path in (self.source / 'keybindings.json', self.agent / 'settings.json'):
             with self.subTest(path=path):

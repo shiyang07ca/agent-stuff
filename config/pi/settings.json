@@ -26,5 +26,8 @@
     }
   },
   "defaultThinkingLevel": "medium",
-  "defaultProjectTrust": "ask"
+  "defaultProjectTrust": "ask",
+  "packages": [
+    "npm:@estebanforge/pi-antigravity-bridge@1.15.0"
+  ]
 }

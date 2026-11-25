@@ -12,7 +12,7 @@
 | 自维护技能 | `custom-skills/` |
 | 第三方技能 | `vendors/` 中固定 commit 的 submodule |
 | 技能启用和调用方式 | `config/agent-control.toml` |
-| Pi 默认模型、显示、压缩和搜索设置 | `config/pi/settings.json` |
+| Pi 默认模型、显示、压缩、搜索和共享外部包 | `config/pi/settings.json` |
 | Pi 模型定义和服务地址 | `config/pi/models.json` |
 | Pi 快捷键 | `config/pi/keybindings.json` |
 | Pi 模式定义 | `config/pi/modes.json` |
@@ -75,13 +75,13 @@ Pi 本地 package 直接读取 `pi/`，因此拉取后新会话或 `/reload` 就
 ~/.agents/skills   -> <repo>/.runtime/current/skills
 ~/.claude/skills   -> <repo>/.runtime/current/skills
 
-~/.pi/agent/settings.json     <- 生成的普通文件，包含 <repo>/pi 路径
+~/.pi/agent/settings.json     <- 生成的普通文件，包含 <repo>/pi 路径及共享 npm 包
 ~/.pi/agent/models.json       <- 生成的普通文件，不含凭据
 ~/.pi/agent/keybindings.json  <- 生成的普通文件
 ~/.pi/agent/modes.json        <- 生成的普通文件
 ```
 
-Pi 原生读取 `~/.agents/skills`，无需再配置一份通用技能路径。技能先复制到 `.runtime` 后切换；Pi 资源直接加载 `pi/`。同名技能只维护一份。
+Pi 原生读取 `~/.agents/skills`，无需再配置一份通用技能路径。技能先复制到 `.runtime` 后切换；Pi 资源直接加载 `pi/`，`config/pi/settings.json` 的 `packages` 可声明精确版本的外部 `npm:<package>@<version>` 包（应用后由各台 Mac 的 Pi 自动安装到 `~/.pi/agent/npm/`）。同名技能只维护一份。
 
 Codex、Claude 和 Pi 的全局指令入口均指向 `global/AGENTS.md`。已有未知文件或链接会阻止应用，不会被覆盖。Pi 全局指令入口仅在仓库启用 Pi 配置时管理。
 
