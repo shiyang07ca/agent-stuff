@@ -15,7 +15,7 @@
   "digest": true,
   "engine": "acp",
   "handoff": "digest",
-  "inactivityTimeoutMin": 5,
+  "inactivityTimeoutMin": 30,
   "mode": "accept-edits",
   "readOnly": false,
   "skipPermissions": true,
