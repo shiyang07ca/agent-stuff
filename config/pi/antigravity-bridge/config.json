@@ -1,0 +1,24 @@
+{
+  "acp": {
+    "sessionRetryOnTimeout": false,
+    "sessionTimeoutMs": 20000,
+    "usageEstimate": "estimate"
+  },
+  "approvals": {
+    "gateMode": "auto",
+    "mode": "ask"
+  },
+  "askTool": true,
+  "bridgeTools": "all",
+  "defaultModel": "gemini-4-carbon",
+  "defaultThinking": "high",
+  "digest": true,
+  "engine": "acp",
+  "handoff": "digest",
+  "inactivityTimeoutMin": 5,
+  "mode": "accept-edits",
+  "readOnly": false,
+  "skipPermissions": true,
+  "systemPrompt": true,
+  "webTools": true
+}

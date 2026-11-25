@@ -169,8 +169,16 @@ def _plan(repo: Path) -> int:
         print(f"  Observed: {entry.observed}")
         print(f"  {entry.path} -> {entry.target}")
     for file in plan.pi_files:
-        print(f"Pi file {file.path.name}: {file.action}")
+        label = (
+            file.path.name
+            if file.path.parent.name == "agent"
+            else f"{file.path.parent.name}/{file.path.name}"
+        )
+        print(f"Pi file {label}: {file.action}")
         print(f"  {file.path}")
+        if file.mode is not None:
+            previous_mode = "missing" if file.previous is None else f"{file.previous_mode:03o}"
+            print(f"  Mode: {previous_mode} -> {file.desired_mode:03o}")
         if file.diff:
             print(file.diff, end="")
     if plan.browser_extension is not None:

@@ -1,4 +1,4 @@
-"""固定四个 Pi 配置文件的校验、生成及安全预览；不运行凭据命令。"""
+"""Pi 配置文件的校验、生成及安全预览；不运行凭据命令。"""
 from __future__ import annotations
 
 import difflib
@@ -13,10 +13,14 @@ from urllib.parse import urlsplit
 from .models import Finding
 
 PI_FILES = ("settings.json", "models.json", "keybindings.json", "modes.json")
+ANTIGRAVITY_BRIDGE_CONFIG = "antigravity-bridge/config.json"
+ANTIGRAVITY_BRIDGE_PACKAGE = "@estebanforge/pi-antigravity-bridge"
 # 只列本仓库使用的内置模型，不复制或联网查询宿主的整个目录。
 BUILTIN_MODELS = {"deepseek/deepseek-flash"}
 LOCAL_SETTINGS = {"lastChangelogVersion", "extensionChangelogVersions"}
+LOCAL_BRIDGE_FLAGS = {"patchCleanupNotified", "digestMigrated"}
 THINKING_LEVELS = {"off", "minimal", "low", "medium", "high", "xhigh", "max"}
+BRIDGE_THINKING_TIERS = {"low", "medium", "high", "xhigh"}
 _PINNED_NPM_PACKAGE = re.compile(
     r"^npm:(?P<name>(?:@[a-z0-9~][a-z0-9-._~]*/)?[a-z0-9~][a-z0-9-._~]*)@"
     r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)"
@@ -147,6 +151,17 @@ def load_pi_config(repo: Path) -> tuple[dict[str, dict] | None, str, list[Findin
             config[name] = parse_object(raw)
             if contains_credentials(config[name]):
                 raise ValueError("Shared Pi configuration must not contain credentials or headers")
+        bridge_dir = source / "antigravity-bridge"
+        if bridge_dir.exists() or bridge_dir.is_symlink():
+            if bridge_dir.is_symlink() or not bridge_dir.is_dir():
+                raise ValueError("Pi source paths must not be symlinks")
+            if [entry.name for entry in bridge_dir.iterdir()] != ["config.json"]:
+                raise ValueError("antigravity-bridge directory must contain only config.json")
+            raw_bridge = _regular_source(source / ANTIGRAVITY_BRIDGE_CONFIG, repo)
+            digest.update(ANTIGRAVITY_BRIDGE_CONFIG.encode() + b"\0" + raw_bridge)
+            config[ANTIGRAVITY_BRIDGE_CONFIG] = parse_object(raw_bridge)
+            if contains_credentials(config[ANTIGRAVITY_BRIDGE_CONFIG]):
+                raise ValueError("Shared Pi configuration must not contain credentials or headers")
         raw_package = _regular_source(package / "package.json", repo)
         digest.update(raw_package)
         _validate_package(package, parse_object(raw_package))
@@ -212,11 +227,11 @@ def _validate_references(config: dict[str, dict]) -> None:
     settings = config["settings.json"]
     if LOCAL_SETTINGS.intersection(settings):
         raise ValueError("Local settings fields must be generated, not shared")
+    seen_packages: set[str] = set()
     if "packages" in settings:
         packages = settings["packages"]
         if not isinstance(packages, list):
             raise ValueError("Shared Pi packages must be an array of exact-version npm:<package>@<version> strings")
-        seen_packages: set[str] = set()
         for package in packages:
             match = _PINNED_NPM_PACKAGE.fullmatch(package) if isinstance(package, str) else None
             if match is None or len(match.group("name")) > 214:
@@ -225,6 +240,13 @@ def _validate_references(config: dict[str, dict]) -> None:
             if package_name in seen_packages:
                 raise ValueError("Duplicate shared Pi package")
             seen_packages.add(package_name)
+    if ANTIGRAVITY_BRIDGE_CONFIG in config:
+        if ANTIGRAVITY_BRIDGE_PACKAGE not in seen_packages:
+            raise ValueError(
+                "Antigravity bridge configuration requires "
+                "@estebanforge/pi-antigravity-bridge in settings.json packages"
+            )
+        _validate_antigravity_bridge(config[ANTIGRAVITY_BRIDGE_CONFIG])
     reference(f"{settings.get('defaultProvider')}/{settings.get('defaultModel')}")
     scoped = settings.get("enabledModels", [])
     if not isinstance(scoped, list):
@@ -257,6 +279,78 @@ def _validate_references(config: dict[str, dict]) -> None:
         raise ValueError("Keybindings must be strings or string arrays")
 
 
+def _is_int_in_range(value: object, minimum: int, maximum: int) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and minimum <= value <= maximum
+
+
+def _validate_antigravity_bridge(bridge: dict) -> None:
+    if LOCAL_BRIDGE_FLAGS.intersection(bridge) or "parseWarnings" in bridge:
+        raise ValueError("Local Antigravity bridge runtime flags must be generated, not shared")
+    required_keys = {
+        "engine", "mode", "handoff", "readOnly", "skipPermissions",
+        "defaultModel", "defaultThinking", "askTool", "webTools",
+        "bridgeTools", "digest", "systemPrompt", "inactivityTimeoutMin",
+        "approvals", "acp",
+    }
+    optional_keys = {"turnTimeoutMin", "agent", "escalateLongTools"}
+    if not required_keys.issubset(bridge) or not set(bridge).issubset(required_keys | optional_keys):
+        raise ValueError("Invalid Antigravity bridge configuration fields")
+    if bridge["engine"] not in {"acp", "stream-json"}:
+        raise ValueError("Invalid Antigravity bridge engine")
+    if bridge["mode"] not in {"accept-edits", "plan"}:
+        raise ValueError("Invalid Antigravity bridge mode")
+    if bridge["handoff"] not in {"digest", "sync"}:
+        raise ValueError("Invalid Antigravity bridge handoff")
+    bool_keys = ("readOnly", "skipPermissions", "askTool", "webTools", "digest", "systemPrompt")
+    if not all(isinstance(bridge[key], bool) for key in bool_keys):
+        raise ValueError("Antigravity bridge flags must be booleans")
+    default_model = bridge["defaultModel"]
+    if not isinstance(default_model, str) or not default_model.strip() or default_model != default_model.strip():
+        raise ValueError("Antigravity bridge defaultModel must be a non-empty trimmed string")
+    if bridge["defaultThinking"] not in BRIDGE_THINKING_TIERS:
+        raise ValueError("Invalid Antigravity bridge defaultThinking")
+    if bridge["bridgeTools"] not in {"none", "mcp", "all", "codemode"}:
+        raise ValueError("Invalid Antigravity bridge bridgeTools")
+    if not _is_int_in_range(bridge["inactivityTimeoutMin"], 0, 1440):
+        raise ValueError("Invalid Antigravity bridge inactivityTimeoutMin")
+    if "turnTimeoutMin" in bridge and not _is_int_in_range(bridge["turnTimeoutMin"], 0, 1440):
+        raise ValueError("Invalid Antigravity bridge turnTimeoutMin")
+    if "agent" in bridge:
+        agent = bridge["agent"]
+        if (
+            not isinstance(agent, str)
+            or not agent.strip()
+            or agent != agent.strip()
+            or len(agent) > 128
+            or any(ord(ch) < 32 or ord(ch) == 127 for ch in agent)
+        ):
+            raise ValueError("Invalid Antigravity bridge agent")
+    if "escalateLongTools" in bridge:
+        tools = bridge["escalateLongTools"]
+        if not isinstance(tools, list) or not all(
+            isinstance(item, str) and item.strip() and item == item.strip()
+            for item in tools
+        ):
+            raise ValueError("Invalid Antigravity bridge escalateLongTools")
+    approvals = bridge["approvals"]
+    if (
+        not isinstance(approvals, dict)
+        or set(approvals) != {"gateMode", "mode"}
+        or approvals["gateMode"] not in {"auto", "shadow", "dedicated", "off"}
+        or approvals["mode"] not in {"ask", "allow", "deny"}
+    ):
+        raise ValueError("Invalid Antigravity bridge approvals configuration")
+    acp = bridge["acp"]
+    if (
+        not isinstance(acp, dict)
+        or set(acp) != {"usageEstimate", "sessionTimeoutMs", "sessionRetryOnTimeout"}
+        or acp["usageEstimate"] not in {"estimate", "direct", "off"}
+        or not _is_int_in_range(acp["sessionTimeoutMs"], 1000, 300_000)
+        or not isinstance(acp["sessionRetryOnTimeout"], bool)
+    ):
+        raise ValueError("Invalid Antigravity bridge acp configuration")
+
+
 def generated_config(name: str, source: dict, existing: dict, repo: Path) -> dict:
     result = dict(source)
     if name == "settings.json":
@@ -274,6 +368,15 @@ def generated_config(name: str, source: dict, existing: dict, repo: Path) -> dic
     if name == "modes.json":
         current = existing.get("currentMode", "default")
         result["currentMode"] = current if isinstance(current, str) and current in result["modes"] else "default"
+    if name == ANTIGRAVITY_BRIDGE_CONFIG:
+        for key in LOCAL_BRIDGE_FLAGS:
+            if key in existing:
+                if not isinstance(existing[key], bool):
+                    raise ValueError("Local Antigravity bridge runtime flags must be booleans (content omitted)")
+                if existing[key]:
+                    result[key] = True
+        if result.get("digest") is False:
+            result["digestMigrated"] = True
     return result
 
 

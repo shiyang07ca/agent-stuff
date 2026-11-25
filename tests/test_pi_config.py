@@ -550,6 +550,149 @@ class PiConfigTests(unittest.TestCase):
         self.assertIsNone(state)
         self.assertTrue(any(f.code == 'PI_CONFIG_INVALID' for f in findings))
 
+    @staticmethod
+    def bridge_config(**overrides):
+        base = {
+            'engine': 'acp',
+            'mode': 'accept-edits',
+            'handoff': 'digest',
+            'readOnly': False,
+            'skipPermissions': True,
+            'defaultModel': 'gemini-4-carbon',
+            'defaultThinking': 'high',
+            'askTool': True,
+            'webTools': True,
+            'bridgeTools': 'all',
+            'digest': True,
+            'systemPrompt': True,
+            'inactivityTimeoutMin': 5,
+            'approvals': {'gateMode': 'auto', 'mode': 'ask'},
+            'acp': {
+                'usageEstimate': 'estimate',
+                'sessionTimeoutMs': 20000,
+                'sessionRetryOnTimeout': False,
+            },
+        }
+        base.update(overrides)
+        return base
+
+    def enable_bridge_package(self):
+        settings_path = self.source / 'settings.json'
+        settings = json.loads(settings_path.read_text())
+        settings['packages'] = ['npm:@estebanforge/pi-antigravity-bridge@1.15.0']
+        self.write(settings_path, settings)
+
+    def test_antigravity_bridge_syncs_mode_0600_and_preserves_local_flags(self):
+        self.enable_bridge_package()
+        source_file = self.source / 'antigravity-bridge/config.json'
+        source_file.parent.mkdir()
+        self.write(source_file, self.bridge_config())
+
+        target_dir = self.agent / 'antigravity-bridge'
+        target_dir.mkdir()
+        sessions = target_dir / 'sessions.json'
+        cache = target_dir / 'models-cache.json'
+        sessions.write_text('{"local": "sessions"}\n')
+        cache.write_text('{"raw": "models"}\n')
+        target_file = target_dir / 'config.json'
+        self.write(
+            target_file,
+            self.bridge_config(
+                defaultModel='pro',
+                webTools=False,
+                patchCleanupNotified=True,
+                temporaryKey='ui-drift',
+            ),
+        )
+        target_file.chmod(0o644)
+
+        plan = self.plan()
+        self.assertFalse(plan.has_errors, plan.findings)
+        bridge_plan = next(f for f in plan.pi_files if f.path == target_file)
+        self.assertEqual(bridge_plan.action, 'replace')
+        self.assertIn('"gemini-4-carbon"', bridge_plan.diff)
+        self.apply(plan)
+
+        written = json.loads(target_file.read_text())
+        self.assertEqual(written['defaultModel'], 'gemini-4-carbon')
+        self.assertTrue(written['webTools'])
+        self.assertTrue(written['patchCleanupNotified'])
+        self.assertNotIn('digestMigrated', written)
+        self.assertNotIn('temporaryKey', written)
+        self.assertEqual(target_file.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(sessions.read_text(), '{"local": "sessions"}\n')
+        self.assertEqual(cache.read_text(), '{"raw": "models"}\n')
+        self.assertTrue(self.plan().is_no_op)
+
+        target_file.chmod(0o644)
+        mode_plan = self.plan()
+        self.assertFalse(mode_plan.is_no_op)
+        self.assertEqual(next(f.action for f in mode_plan.pi_files if f.path == target_file), 'replace')
+        self.apply(mode_plan)
+        self.assertEqual(target_file.stat().st_mode & 0o777, 0o600)
+
+        target_file.unlink()
+        self.write(source_file, self.bridge_config(digest=False))
+        self.apply()
+        disabled_digest = json.loads(target_file.read_text())
+        self.assertFalse(disabled_digest['digest'])
+        self.assertTrue(disabled_digest['digestMigrated'])
+        self.assertTrue(self.plan().is_no_op)
+
+    def test_antigravity_bridge_validates_package_coupling_schema_and_local_target(self):
+        source_file = self.source / 'antigravity-bridge/config.json'
+        source_file.parent.mkdir()
+        self.write(source_file, self.bridge_config())
+        missing_pkg = self.fixture.run('validate')
+        self.assertEqual(missing_pkg.returncode, 1, missing_pkg.stdout)
+        self.assertIn('PI_CONFIG_INVALID', missing_pkg.stdout)
+
+        self.enable_bridge_package()
+        invalid_sources = [
+            self.bridge_config(patchCleanupNotified=True),
+            self.bridge_config(digestMigrated=True),
+            self.bridge_config(engine='sqlite'),
+            self.bridge_config(webTools='on'),
+            self.bridge_config(inactivityTimeoutMin=True),
+            self.bridge_config(defaultModel=''),
+            self.bridge_config(acp={'usageEstimate': 'estimate', 'sessionTimeoutMs': 500, 'sessionRetryOnTimeout': False}),
+            self.bridge_config(approvals={'gateMode': 'auto'}),
+            {**self.bridge_config(), 'apiKey': 'SECRET'},
+        ]
+        for index, invalid in enumerate(invalid_sources):
+            with self.subTest(case=index):
+                self.write(source_file, invalid)
+                result = self.fixture.run('validate')
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn('PI_CONFIG_INVALID', result.stdout)
+                self.assertNotIn('SECRET', result.stdout + result.stderr)
+
+        self.write(source_file, self.bridge_config())
+        stray = source_file.parent / 'extra.json'
+        stray.write_text('{}\n')
+        self.assertEqual(self.fixture.run('validate').returncode, 1)
+        stray.unlink()
+
+        target_dir = self.agent / 'antigravity-bridge'
+        target_dir.mkdir()
+        target_file = target_dir / 'config.json'
+        for bad_content in ('{ // jsonc not supported by bridge\n}\n', '{"digestMigrated": "yes"}\n'):
+            target_file.write_text(bad_content)
+            plan = self.plan()
+            self.assertTrue(plan.has_errors)
+            self.assertTrue(any(f.code == 'PI_LOCAL_CONFIG_INVALID' for f in plan.findings))
+
+        target_file.unlink()
+        outside = self.home / 'outside-bridge.json'
+        outside.write_text('{}\n')
+        target_file.symlink_to(outside)
+        before = self.fixture.observable_tree(self.home)
+        blocked = self.plan()
+        self.assertTrue(blocked.has_errors)
+        result = runtime.apply_runtime_plan(self.repo, self.home, blocked.fingerprint)
+        self.assertTrue(result.has_errors)
+        self.assertEqual(before, self.fixture.observable_tree(self.home))
+
 
 if __name__ == '__main__':
     unittest.main()

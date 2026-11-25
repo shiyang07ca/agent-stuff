@@ -16,6 +16,7 @@
 | Pi 模型定义和服务地址 | `config/pi/models.json` |
 | Pi 快捷键 | `config/pi/keybindings.json` |
 | Pi 模式定义 | `config/pi/modes.json` |
+| Antigravity 桥接默认模型、工具暴露和执行参数 | `config/pi/antigravity-bridge/config.json` |
 | Pi 扩展、技能、命令和主题 | `pi/`，详见 [资源说明](pi/README.md) |
 | 编排角色模型 | `pi/extensions/orchestrate.ts` 的 `CONFIG` 和 `IMPLEMENTERS` |
 
@@ -79,13 +80,14 @@ Pi 本地 package 直接读取 `pi/`，因此拉取后新会话或 `/reload` 就
 ~/.pi/agent/models.json       <- 生成的普通文件，不含凭据
 ~/.pi/agent/keybindings.json  <- 生成的普通文件
 ~/.pi/agent/modes.json        <- 生成的普通文件
+~/.pi/agent/antigravity-bridge/config.json <- 生成的普通文件（0600）
 ```
 
 Pi 原生读取 `~/.agents/skills`，无需再配置一份通用技能路径。技能先复制到 `.runtime` 后切换；Pi 资源直接加载 `pi/`，`config/pi/settings.json` 的 `packages` 可声明精确版本的外部 `npm:<package>@<version>` 包（应用后由各台 Mac 的 Pi 自动安装到 `~/.pi/agent/npm/`）。同名技能只维护一份。
 
 Codex、Claude 和 Pi 的全局指令入口均指向 `global/AGENTS.md`。已有未知文件或链接会阻止应用，不会被覆盖。Pi 全局指令入口仅在仓库启用 Pi 配置时管理。
 
-`settings.json` 保留本机 `lastChangelogVersion` 和 `extensionChangelogVersions`，`modes.json` 保留仍有效的本机 `currentMode`。其余共享值按仓库生成，包括删除的配置项。`auth.json`、`trust.json`、`models-store.json`、sessions、background、tmux-subagents、socket 和日志不被日常 apply 修改。
+`settings.json` 保留本机 `lastChangelogVersion` 和 `extensionChangelogVersions`，`modes.json` 保留仍有效的本机 `currentMode`，`antigravity-bridge/config.json` 保留本机一次性标记 `patchCleanupNotified` 和 `digestMigrated`。其余共享值按仓库生成，包括删除的配置项。`auth.json`、`trust.json`、`models-store.json`、`antigravity-bridge/` 下的会话与模型缓存、sessions、background、tmux-subagents、socket 和日志不被日常 apply 修改。
 
 需要本机模型地址时，创建 `~/.config/agent-stuff/local.json`，只覆盖仓库中已有 provider 的 `baseUrl`：
 

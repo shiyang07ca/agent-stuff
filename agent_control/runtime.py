@@ -29,6 +29,7 @@ from .models import (
     RuntimePlan,
 )
 from .pi_config import (
+    ANTIGRAVITY_BRIDGE_CONFIG,
     auth_readiness,
     config_diff,
     credential_providers,
@@ -466,19 +467,29 @@ def _pi_file_plans(
     readiness: dict[str, bool] = {}
     for name, source in config.items():
         path = home / ".pi" / "agent" / name
+        desired_mode = 0o600 if name == ANTIGRAVITY_BRIDGE_CONFIG else None
         parent_finding = _entry_parent_finding(path, home)
         if parent_finding is not None:
             findings.append(parent_finding)
-            files.append(RuntimeFilePlan(path, "blocked", "unmanaged-parent", b""))
+            files.append(RuntimeFilePlan(path, "blocked", "unmanaged-parent", b"", mode=desired_mode))
             continue
         try:
             observed, previous, mode = _file_observation(path)
-            existing = parse_object(previous, jsonc=True) if previous is not None else {}
+            existing = (
+                parse_object(previous, jsonc=name != ANTIGRAVITY_BRIDGE_CONFIG)
+                if previous is not None
+                else {}
+            )
             desired = generated_config(name, source, existing, repo)
             if name == "models.json":
                 desired = local_model_config(desired, home)
             content = json_bytes(desired)
-            action: PlanAction = "no-change" if previous == content else "add" if previous is None else "replace"
+            mode_matches = desired_mode is None or mode == desired_mode
+            action: PlanAction = (
+                "no-change" if previous == content and mode_matches
+                else "add" if previous is None
+                else "replace"
+            )
             if name == "models.json":
                 readiness = auth_readiness(path.with_name("auth.json"), credential_providers(existing))
                 for provider, ready in readiness.items():
@@ -489,10 +500,10 @@ def _pi_file_plans(
                             str(path), "Configure local authentication before removing these credentials; values are never copied automatically.",
                         ))
             files.append(RuntimeFilePlan(path, action, observed, content, previous, mode,
-                                    config_diff(name, existing, desired)))
+                                    config_diff(name, existing, desired), mode=desired_mode))
         except (OSError, ValueError) as error:
             findings.append(Finding("error", "PI_LOCAL_CONFIG_INVALID", str(error), str(path)))
-            files.append(RuntimeFilePlan(path, "blocked", "invalid-local-file", b""))
+            files.append(RuntimeFilePlan(path, "blocked", "invalid-local-file", b"", mode=desired_mode))
     return tuple(files), identity, readiness, findings
 
 
@@ -1266,7 +1277,8 @@ def _plan_fingerprint(
         "pi_files": [
             {"path": str(file.path), "action": file.action,
              "observed": file.observed,
-             "desired": hashlib.sha256(file.content).hexdigest()}
+             "desired": hashlib.sha256(file.content).hexdigest(),
+             **({"mode": file.desired_mode} if file.mode is not None else {})}
             for file in pi_files
         ],
         "browser_files": [
