@@ -21,6 +21,8 @@ export default function filesExtension(pi: ExtensionAPI): void {
 					const close = () => done(undefined);
 					controller.signal.addEventListener("abort", close, { once: true });
 					return {
+						// 全屏翻页键交给文件浏览器，避免被聊天记录滚动提前消费。
+						capturesViewportInput: true,
 						get focused() { return browser.focused; },
 						set focused(value: boolean) { browser.focused = value; },
 						render: (width) => browser.render(width),
