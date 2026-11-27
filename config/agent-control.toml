@@ -27,7 +27,7 @@ skills = [
 
 [[skills]]
 source = "custom-skills/teach"
-invocation = "implicit"
+invocation = "explicit"
 
 [[skills]]
 source = "custom-skills/socratic-tutor"

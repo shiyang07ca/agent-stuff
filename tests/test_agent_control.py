@@ -389,7 +389,11 @@ class AuthoritativeStateTests(unittest.TestCase):
         }
 
         self.assertEqual(len(skills), 49)
-        self.assertEqual(invocation_counts, {"implicit": 21, "explicit": 28})
+        self.assertEqual(invocation_counts, {"implicit": 20, "explicit": 29})
+        self.assertIn(
+            {"source": "custom-skills/teach", "invocation": "explicit"},
+            skills,
+        )
         self.assertIn(
             {"source": "custom-skills/socratic-tutor", "invocation": "explicit"},
             skills,
@@ -479,7 +483,7 @@ class AuthoritativeStateTests(unittest.TestCase):
                     for skill in skills
                 ).encode()
             ).hexdigest(),
-            "888f2465794b32c16dcdfb5ff85d4b579de1e221666138f2570ac13c3e5bc4ee",
+            "310ba5f8bafb8af0ca4050b866fd0f134c86aad39d4802c3b15423e7448464bd",
         )
 
     def test_agent_reach_selection_uses_the_upstream_chinese_skill(self) -> None:
